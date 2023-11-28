@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>GENERAL AUTH TESTPAGE</title>
+
+    <script type="text/javascript">
+        function updateJwt() {
+            let button = document.getElementById("theButton")
+            let send = button.form.jwt.value;
+            document.getElementById("jwtValue").innerHTML = send;
+        }
+
+        function updateIss() {
+            let button = document.getElementById("theButton1")
+            let send = button.form.iss.value;
+            document.getElementById("issValue").innerHTML = send;
+        }
+
+        function updateSub() {
+            let button = document.getElementById("theButton2")
+            let send = button.form.sub.value;
+            document.getElementById("subValue").innerHTML = send;
+        }
+
+        function getJwt() {
+            let jwt = document.getElementById("jwtValue").innerHTML;
+            return jwt;
+        }
+
+        function lpGetAuthenticationToken(callback) {
+            //Standard
+            let jwt = getJwt();
+            callback(jwt);
+        }
+
+        function setAuthIdentities(tag) {
+            tag.identities.push(identityFn);
+            function identityFn(callback) {
+                let issValue = document.getElementById("jwtValue").innerHTML;
+                let subValue = document.getElementById("subValue").innerHTML;
+                callback({
+                    iss: issValue,
+                    acr: "loa1",
+                    sub: subValue
+                });
+            }
+            window.lpTag.start()
+        }
+    </script>
+
+    <!-- BEGIN LivePerson Monitor. -->
+    <script type="text/javascript">
+        // get params from the queryString in the window search
+        const queryString = window.location.search;
+        console.log("queryString: " + queryString);
+        const urlParams = new URLSearchParams(queryString);
+        section = urlParams.get('section')
+        site = urlParams.get('site')
+        console.log("section: " + section);
+        console.log("site: " + site);
+
+        // Call the LP tag with the site for the parent account
+        window.lpTag = window.lpTag || {}, window.lpTag.autoStart = false, 'undefined' == typeof window.lpTag._tagCount ? (window.lpTag = { wl: lpTag.wl || null, scp: lpTag.scp || null, site: site || '', section: lpTag.section || '', tagletSection: lpTag.tagletSection || null, autoStart: lpTag.autoStart !== !1, ovr: lpTag.ovr || {}, _v: '1.10.0', _tagCount: 1, protocol: 'https:', events: { bind: function (t, e, i) { lpTag.defer(function () { lpTag.events.bind(t, e, i) }, 0) }, trigger: function (t, e, i) { lpTag.defer(function () { lpTag.events.trigger(t, e, i) }, 1) } }, defer: function (t, e) { 0 === e ? (this._defB = this._defB || [], this._defB.push(t)) : 1 === e ? (this._defT = this._defT || [], this._defT.push(t)) : (this._defL = this._defL || [], this._defL.push(t)) }, load: function (t, e, i) { var n = this; setTimeout(function () { n._load(t, e, i) }, 0) }, _load: function (t, e, i) { var n = t; t || (n = this.protocol + '//' + (this.ovr && this.ovr.domain ? this.ovr.domain : 'lptag.liveperson.net') + '/tag/tag.js?site=' + this.site); var o = document.createElement('script'); o.setAttribute('charset', e ? e : 'UTF-8'), i && o.setAttribute('id', i), o.setAttribute('src', n), document.getElementsByTagName('head').item(0).appendChild(o) }, init: function () { this._timing = this._timing || {}, this._timing.start = (new Date).getTime(); var t = this; window.attachEvent ? window.attachEvent('onload', function () { t._domReady('domReady') }) : (window.addEventListener('DOMContentLoaded', function () { t._domReady('contReady') }, !1), window.addEventListener('load', function () { t._domReady('domReady') }, !1)), 'undefined' === typeof window._lptStop && this.load() }, start: function () { this.autoStart = !0 }, _domReady: function (t) { this.isDom || (this.isDom = !0, this.events.trigger('LPT', 'DOM_READY', { t: t })), this._timing[t] = (new Date).getTime() }, vars: lpTag.vars || [], dbs: lpTag.dbs || [], ctn: lpTag.ctn || [], sdes: lpTag.sdes || [], hooks: lpTag.hooks || [], identities: lpTag.identities || [], ev: lpTag.ev || [] }, lpTag.init()) : window.lpTag._tagCount += 1;
+        window.lpTag.section = section;
+        //lpTag.identities = [];
+    </script>
+    <!-- END LivePerson Monitor. -->
+
+</head>
+
+<body>
+    <div class="jumbotron text-center" style="background-color: #003465;">
+        <img class="w-25 p-3" src="./LP-Logo-white.png" alt="LP">
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <!-- This div is the bit that determines the child account in the engagement we will set it from javascript -->
+                <div id="lp-trigger-div" class="chat js-lpMessaging utils-hidden" data-lp-referenceId=""></div>
+                <p><b>AccountId</b>: <var id=site-var></var></p>
+                <p><b>Section</b>: <var id=section-var></var></p>
+                <p id="description-text">Make sure the URL follows this template:<br>
+                    <b>http://gentest.dev.lprnd.net:8089/?site=*accountId*&amp;section=*sectionValue*</b></p>
+                <p>
+                    <li>Example: <b><a
+                            href="http://gentest.dev.lprnd.net:8089/?site=71064152">http://gentest.dev.lprnd.net:8089/?site=71064152</a></b>
+                    </li>
+                </p>
+                <p>For authenticated conversation, insert the JWT, iss and sub into the forms below and press START AUTH LPTAG<br>
+                    The method name to be called (implicit flow) has to be: <b>lpGetAuthenticationToken</b>
+                </p>
+                <br>
+                <p>For UNauthenticated conversation, only press START UNAUTH LPTAG
+                </p>
+                <br>
+                <p>Once the conversation is created, you can't switch from authenticated to unauthenticated and vice versa. You need a refresh of the page.
+                </p>
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <form>
+                    <label for="jwtId">JWT:</label>
+                    <input type="text" id="jwtId" name="jwt" />
+                    <input value="submit" type="button" onclick="updateJwt()" id="theButton" />
+                </form>
+                <pre style="background-color: gray; padding: 20px; color:white;"><code><div id="jwtValue" style="white-space: pre-wrap;"></div></code></pre>
+                <br>
+                <form>
+                    <label for="issId">iss:</label>
+                    <input type="text" id="issId" name="iss" />
+                    <input value="submit" type="button" onclick="updateIss()" id="theButton1" />
+                </form>
+                <pre style="padding: 20px; color:rgb(0, 0, 0);"><code><div id="issValue" style="white-space: pre-wrap;"></div></code></pre>
+                <form>
+                    <label for="subId">sub:</label>
+                    <input type="text" id="subId" name="sub" />
+                    <input value="submit" type="button" onclick="updateSub()" id="theButton2" />
+                </form>
+                <pre style="padding: 20px; color:rgb(0, 0, 0);"><code><div id="subValue" style="white-space: pre-wrap;"></div></code></pre>
+                <br>
+                <br>
+                <button onclick="setAuthIdentities(window.lpTag)" style="margin-left: 2px">START AUTH LPTAG</button><button onclick="window.lpTag.start()" style="margin-left: 2px">START UNAUTH LPTAG</button>
+                <br>
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+
+            </div>
+        </div>
+    </div>
+
+
+</body>
+<!-- This sets those attributes then when the lp tag is loaded simulates a click event -->
+<script type="text/javascript">
+    // set the div requirements
+    document.getElementById("site-var").innerHTML = site;
+    document.getElementById("section-var").innerHTML = section;
+    // new version
+    window.lpTag.events.bind({
+        eventName: "OFFER_DISPLAY",
+        appName: "LP_OFFERS",
+        triggerOnce: false,
+        async: true,
+        func: function (data) {
+            console.log(data)
+            // This is different per engagement
+            const LPButton = document.querySelector(".js-bipLpButton");
+            LPButton.click();
+        }
+    })
+</script>
+
+
+</html>
